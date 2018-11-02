@@ -1,0 +1,4 @@
+1. Show a jpeg image on canvas
+2. Get pixel information of image on canvas
+3. redraw part of image from pixel information
+4. 
