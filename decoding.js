@@ -55,7 +55,7 @@ function mergeImage(id, imgData, decodeLaw) {
         dData = dImgData.data;
     
     // This piece is for one and one row column gap
-    for(var i = 0; i <= baseWd*4; i=i+4) {
+    /*for(var i = 0; i <= baseWd*4; i=i+4) {
         for(var j = 0; j <= baseWd*4; j=j+4) {
             var index = i*baseWd + j;
             dData[2*index + i*baseWd*4] = baseData[index];
@@ -63,7 +63,38 @@ function mergeImage(id, imgData, decodeLaw) {
             dData[2*index + i*baseWd*4 + 2] = baseData[index + 2];//baseData[baseIndex + 2];
             dData[2*index + i*baseWd*4 + 3] = 255;
         }        
+    }*/
+    
+    // simple superimposing algorithm
+    var baseIndex = 0;
+    for(var i = 0; i <= dImgWd*4; i=i+4) {
+        for(var j = 0; j <= dImgHt*8; j=j+4) {
+            var index = i*dImgWd + j;
+            if(i % 8 == 0 && j % 8 == 0) {
+                var baseIndex = i*dImgWd/4 + j/2;
+                dData[index] = baseData[baseIndex];
+                dData[index + 1] = baseData[baseIndex + 1];//baseData[baseIndex + 1];
+                dData[index + 2] = baseData[baseIndex + 2];//baseData[baseIndex + 2];
+                dData[index + 3] = 255;
+            } else {
+                dData[index] = 255;
+                dData[index + 1] = 0;
+                dData[index + 2] = 0;
+                dData[index + 3] = 255;
+            }
+        }
     }
+    /*for(var i = 0; i <= dImgWd*4; i=i+4) {
+        for(var j = 0; j <= dImgHt*8; j=j+4) {
+            if(i % 8 == 0 && j % 8 == 0) {
+                var index = i*dImgWd + j;
+                dData[index] = 255;
+                dData[index + 1] = 0;
+                dData[index + 2] = 0;
+                dData[index + 3] = 255;
+            }            
+        }
+    }*/
     
     /*for(var i = 0; i < baseData.length; i=i+4) {
         dData[2*i] = baseData[i];
