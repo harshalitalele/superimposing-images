@@ -1,12 +1,30 @@
+var bImgWd, bImgHt;
 function drawBaseImage(imagePath) {
     var canvas = document.getElementById("playboard"),
         ctx = canvas.getContext("2d"),
         baseImg = new Image();
     baseImg.src = imagePath;
     baseImg.onload = function() {
-        ctx.drawImage(baseImg, 0, 0, canvas.width, canvas.height);
+        bImgWd = baseImg.width;
+        bImgHt = baseImg.height;
+        ctx.drawImage(baseImg, 0, 0);
         //superImposeUpflowers();
     }
+}
+
+function getRgb(arr, wd, ht, x, y) {
+    var r = arr[((y-1)*wd + x)*4 + 0],
+        g = arr[((y-1)*wd + x)*4 + 1],
+        b = arr[((y-1)*wd + x)*4 + 2],
+        a = arr[((y-1)*wd + x)*4 + 3];
+    return [r, g, b, a];
+}
+
+function setRgb(arr, wd, ht, x, y, rgba) {
+    arr[((y-1)*wd + x)*4 + 0] = rgba[0];
+    arr[((y-1)*wd + x)*4 + 1] = rgba[1];
+    arr[((y-1)*wd + x)*4 + 2] = rgba[2];
+    arr[((y-1)*wd + x)*4 + 3] = rgba[3];
 }
 
 function superImposeUpflowers() {
@@ -16,41 +34,43 @@ function superImposeUpflowers() {
         upImg = new Image(),
         upimgPixels,
         downimgPixels,
-        superimPixels;
-    canvas.setAttribute("width", 487);
-    canvas.setAttribute("height", 487);
+        superimPixels,
+        dispFact = parseInt(document.getElementById("disp-fact").value);
+    canvas.setAttribute("width", 480);
+    canvas.setAttribute("height", 495);
     upImg.src = "si/upFlow.jpg";
     upImg.onload = function() {
-        ctx.drawImage(upImg, 0, 0, canvas.width, canvas.height);
-        upimgPixels = ctx.getImageData(0,0,canvas.width,canvas.height);
-        downimgPixels = baseCtx.getImageData(0,0,960,328);
-        superimPixels = ctx.createImageData(960, 328);
+        ctx.drawImage(upImg, 0, 0, 480, 495);
+        upimgPixels = ctx.getImageData(0,0,480,495);
+        downimgPixels = baseCtx.getImageData(0,0,bImgWd,bImgHt);
+        superimPixels = ctx.createImageData(bImgWd*2, bImgHt*2);
         var superimArr = superimPixels.data,
             upimArr = upimgPixels.data,
             downArr = downimgPixels.data,
-            newPix = 0;
-        for(var i = 0; i < 328; i++) {
-            for(var j = 0; j < 960; j++) {
-                var supPix = i*960*4 + j*4;
-                if((j+1)%2 == 0 || (i+1)%2 == 0) {
-                    superimArr[supPix + 0] = upimArr[newPix++];
+            newPix = 0,
+            downPix = 0;
+        for(var j = 0; j < bImgHt*2; j++) {
+            for(var i = 0; i < bImgWd*2; i++) {
+                var supPix = i*bImgWd*2*4 + j*4;
+                if(!(i%2 == 0 && j%2 == 0)) {
+                    var x = parseInt(newPix%480),
+                        y = parseInt(newPix/480),
+                        rgba = getRgb(upimArr, 480, 495, x, y);
+                    setRgb(superimArr, bImgWd*2, bImgHt*2, i, j, rgba);
+                    newPix++;
+                    /*superimArr[supPix + 0] = upimArr[newPix++];
                     superimArr[supPix + 1] = upimArr[newPix++];
                     superimArr[supPix + 2] = upimArr[newPix++];
-                    superimArr[supPix + 3] = upimArr[newPix++];
+                    superimArr[supPix + 3] = upimArr[newPix++];*/
                 } else {
-                    superimArr[supPix + 0] = downArr[supPix + 0];
-                    superimArr[supPix + 1] = downArr[supPix + 1];
-                    superimArr[supPix + 2] = downArr[supPix + 2];
-                    superimArr[supPix + 3] = downArr[supPix + 3];
+                    /*superimArr[supPix + 0] = downArr[downPix++];
+                    superimArr[supPix + 1] = downArr[downPix++];
+                    superimArr[supPix + 2] = downArr[downPix++];
+                    superimArr[supPix + 3] = downArr[downPix++];*/
                 }
             }
         }
-        /*for(var i in upimArr) {
-            si = parseInt(i) + (parseInt(i/4) + 1)*4;
-            sialt = parseInt(i) + (parseInt(i/4))*4;
-            superimArr[si] = upimArr[i];
-            superimArr[sialt] = downArr[sialt];
-        }*/
+        
         baseCtx.putImageData(superimPixels, 0, 0);
     }
 }
