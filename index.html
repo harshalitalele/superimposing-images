@@ -9,7 +9,7 @@
             <canvas width="960" height="330" id="playboard"></canvas>
         </div>-->
         <img src="si/downFlow.jpg" id='img' style='display: none;'/>
-        <canvas id="base"></canvas>
+        <canvas width="480" height="165" id="base"></canvas>
         <div>
             <script src="decoding.js"></script>
         </div>
@@ -17,7 +17,7 @@
             var ctx = document.getElementById('base').getContext('2d');
             var img = document.getElementById('img');
             ctx.drawImage(img, 0, 0);
-            getImgData('base', 'si/upflow.jpg');
+            getImgData('base', 'si/upFlow.jpg');
         </script>
     </body>
 </html>

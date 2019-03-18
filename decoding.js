@@ -66,24 +66,54 @@ function mergeImage(id, imgData, decodeLaw) {
     }*/
     
     // simple superimposing algorithm
-    var baseIndex = 0;
-    for(var i = 0; i <= dImgWd*4; i=i+4) {
-        for(var j = 0; j <= dImgHt*8; j=j+4) {
-            var index = i*dImgWd + j;
-            if(i % 8 == 0 && j % 8 == 0) {
-                var baseIndex = i*dImgWd/4 + j/2;
+    var upflowIndex = 0,
+        baseIndex = 0;
+    for(var j = 0; j < dImgHt; j++) {
+        for(var i = 0; i < dImgWd; i++) {
+            var index = (j-1)*dImgWd*4 + (i-1)*4;
+            if (i % 2 == 0 && j % 2 == 0) {
+                //var baseIndex = j*dImgWd/4 + i/2;
                 dData[index] = baseData[baseIndex];
-                dData[index + 1] = baseData[baseIndex + 1];//baseData[baseIndex + 1];
-                dData[index + 2] = baseData[baseIndex + 2];//baseData[baseIndex + 2];
+                dData[index + 1] = baseData[baseIndex + 1]; //baseData[baseIndex + 1];
+                dData[index + 2] = baseData[baseIndex + 2]; //baseData[baseIndex + 2];
                 dData[index + 3] = 255;
+                baseIndex = baseIndex + 4;
             } else {
-                dData[index] = 255;
-                dData[index + 1] = 0;
-                dData[index + 2] = 0;
+                dData[index] = imgData.data[upflowIndex];
+                dData[index + 1] = imgData.data[upflowIndex + 1];
+                dData[index + 2] = imgData.data[upflowIndex + 2];
                 dData[index + 3] = 255;
+                upflowIndex = upflowIndex + 4;
             }
         }
     }
+    
+    /*for(var j = 0; j <= imgData.height*4; j=j+4) {
+        for(var i = 0; i <= imgData.width*4; i=i+4) {
+            var index = i*dImgWd + j;
+            if(!(i % 8 == 0 && j % 8 == 0)) {
+                dData[index] = imgData.data[upflowIndex];
+                dData[index + 1] = imgData.data[upflowIndex + 1];
+                dData[index + 2] = imgData.data[upflowIndex + 2];
+                dData[index + 3] = 255;
+                upflowIndex = upflowIndex + 4;
+            }
+        }
+    }*/
+    
+    /*for(i = 0; i < 330; i++) {
+        for(j = 0; j < 960; j++) {
+            var index = (i-1)*dImgWd*4 + (j-1)*4;
+            if(!(i % 2 == 0 && j % 2 == 0)) {
+                dData[index] = imgData.data[upflowIndex];
+                dData[index + 1] = imgData.data[upflowIndex + 1];
+                dData[index + 2] = imgData.data[upflowIndex + 2];
+                dData[index + 3] = imgData.data[upflowIndex + 3];
+                upflowIndex = upflowIndex + 4;
+            }
+        }
+    }*/
+    
     /*for(var i = 0; i <= dImgWd*4; i=i+4) {
         for(var j = 0; j <= dImgHt*8; j=j+4) {
             if(i % 8 == 0 && j % 8 == 0) {
@@ -105,8 +135,6 @@ function mergeImage(id, imgData, decodeLaw) {
     
     dImgCtx.putImageData(dImgData, 0, 0);
     document.body.appendChild(dImgElem);
-    
-    
 }
 
 /*getQuadrapledIndex(i, j, wd) {
